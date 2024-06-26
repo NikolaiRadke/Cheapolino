@@ -4,7 +4,8 @@
     For ATtiny45/85 - set to 8 Mhz | B.O.D disabled | No bootloader.
     Remember to flash the "bootloader" first!
     Only for Spence Konde's ATTinyCore - it provides hardware serial emulation.
-    Software serial is not working with pin change interrupt!
+    * Software serial is not working with pin change interrupt.
+    * Direct port manipulation is not working with mosfet.
 
     Flash usage: 3.540 (IDE 2.3.0 | AVR 1.8.6 | ATTinyCore 1.5.2 | Linux X86_64 | ATtiny85)
     Power:       21mA (idle) | 3.8mA (light sleep) | 2μA (deep sleep)
@@ -19,7 +20,6 @@
     7: D2  | PB2  Button - GND
     8: VCC        VCC
 
-  To do: Portmanipulation, Code optimieren
 */
 
 #include <avr/sleep.h>
