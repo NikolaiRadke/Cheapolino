@@ -1,6 +1,6 @@
 # Cheapolino  
   
-The easy-tu-build budget version of Nokolino with advanced power saving.  
+The easy-to-build budget version of Nokolino with advanced power saving.  
   
 **25.06.2024** Gerber files added.  
 **25.06.2024** The PCBs arrived, a testing Cheapolino was build and runs perfectly!  
