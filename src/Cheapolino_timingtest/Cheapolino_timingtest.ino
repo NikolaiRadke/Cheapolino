@@ -1,4 +1,5 @@
-/*  Cheapolino V1.0 09.07.2024 - Nikolai Radke
+/*  Cheapolino V1.0 27.06.2024 - Nikolai Radke
+
     Sketch for budget Nokolino with JQ8400 module
     For ATtiny45/85 - set to 8 Mhz | B.O.D disabled | No bootloader.
     Remember to flash the "bootloader" first!
@@ -6,7 +7,7 @@
     * Software serial is not working with pin change interrupt.
     * Direct port manipulation is not working with mosfet.
 
-    Flash usage: 3.540 (IDE 2.3.2 | ATTinyCore 1.5.2 | Linux X86_64 | ATtiny85)
+    Flash usage: 3.558 (IDE 2.3.0 | AVR 1.8.6 | ATTinyCore 1.5.2 | Linux X86_64 | ATtiny85)
     Power:       21mA (idle) | 3.8mA (light sleep) | 2μA (deep sleep)
 
 
@@ -18,6 +19,7 @@
     6: D1  | PB1  TX     - 4 JQ8400
     7: D2  | PB2  Button - GND
     8: VCC        VCC
+
 */
 
 #include <avr/sleep.h>
@@ -28,12 +30,12 @@
 //-------------------------------------------------------------------------------------------------
 // User Configuation
 #define Time             10                      // Say something every statistical 10 minutes
-#define Volume           16                      // Volume 0-30 - <20 is recommended 
+#define Volume           20                      // Volume 0-30 - 25 is recommended 
 
 // Optional - comment out with // to disable o remove // to enable
 #define StartupBeep                              // Will say "beep" when turned on
 #define BatteryWarning                           // Gives a warning when battery is low
-#define CountFiles                               // Count files for music box mode
+#define CountFiles                               // Count files for music
 
 //-------------------------------------------------------------------------------------------------
 // Internal configuration
@@ -57,10 +59,6 @@
 #define Button           PB2                     // Pin 6
 
 #define Button_pressed   !(PINB & (1 << Button))
-
-// Generate a precompiled random number from compiling time string
-#define  Ctime __TIME__                          // Get compile time
-#define  Firstseed uint16_t((uint8_t(Ctime[3])) + (uint8_t(Ctime[4])) + (uint8_t(Ctime[6])) + (uint8_t(Ctime[7])))
 
 // Variables
 uint16_t seed;                                   // Random seed and helping variable
@@ -96,15 +94,16 @@ int main(void) {
     DDRB  |= (1 << JQ8400);                      // PB3 JQ8400 MOSFET switch OUTPUT
     
     // Start JQ8400 and count files
-    JQ8400_init();                               // Start JQ8400
-    _delay_ms(500);
+    JQ8400_init();
+    _delay_ms(100);
 
     #ifdef CountFiles                            // Count files for music box mode
+      _delay_ms(500);
       Serial.write("\xAA\x0C");                  // Count files on module
       Serial.write((uint8_t) 0x00);              // 0x00 must be send as byte
       Serial.write(0xB6);
       _delay_ms(100);                            // Wait for answer from JQ8400
-      for (seed = 0; seed < 6; seed ++)          // Read 6 HEX chars from module
+      for (seed = 0; seed < 6; seed++)           // Read 6 HEX chars from module
         files_byte[seed] = (uint8_t) Serial.read(); // and convert the chars into uint8_t
         _delay_ms(1);
       files = 16 * files_byte[3] + files_byte[4]; // Convert 2 bytes into uint16_t
@@ -122,7 +121,7 @@ int main(void) {
         // Initialize EEPROM and size for first use or after end of cycle
         address = 2;                             // Starting address
         eeprom_write_word(0, address);           // Write starting address
-        eeprom_write_word(address, Firstseed);   // Write personal seed 
+        eeprom_write_word(address, 0);           // Write seed 0
       }
       seed = eeprom_read_word(address);          // Read seed
       if (seed > 999) {                          // After 1000 write-cyles move to another address
@@ -169,7 +168,7 @@ int main(void) {
         // Music box mode
         else {
           JQ8400_play(address);                  //  Play single music box files
-          (address == files) ? address = 1 : address ++; // Set to next file
+          (address == files) ? address = 1 : address++; // Set to next file
         }
       }
 
@@ -210,12 +209,12 @@ int main(void) {
 // Functions
 void JQ8400_init() {
   digitalWrite(JQ8400, HIGH);                    // Power up JQ8400 - direct port manipulation doesn't work!
-  _delay_ms(500);                                // JQ8400 needs a short time to settle
+  _delay_ms(250);                                // JQ8400 needs a short time to settle
   Serial.begin(9600);                            // Start serial connection to JQ8400
   Serial.write("\xAA\x04");                      // Reset JQ8400
   Serial.write((uint8_t) 0x00);                  // Needed to reset strange default settings,
   Serial.write(0xAE);                            // maybe from outer space
-  _delay_ms(250);                                // Wait for JQ8400
+  _delay_ms(250);                               // Wait for JQ8400
   Serial.write("\xAA\x1A\x01\x02\xC7");          // Set equalizer to rock mode for better voice sound
   _delay_ms(100);                                // Time to settle, JQ8400 ALWAYS needs time
   Serial.write("\xAA\x13\x01");                  // Set volume
@@ -223,7 +222,7 @@ void JQ8400_init() {
   Serial.write(Volume);                          // Volume 0-30
   _delay_ms(10);
   Serial.write((uint8_t) 190 + Volume);          // Calculate and write checksum
-  _delay_ms(300);                                // Wait some more extra time
+  _delay_ms(100);                                // Wait some more extra time
 }
 
 void JQ8400_play(uint8_t f) {                    // Plays MP3 file
