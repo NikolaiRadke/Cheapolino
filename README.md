@@ -2,7 +2,7 @@
   
 The easy-to-build budget version of Nokolino with advanced power saving. Cheapolino aims to cost less then **10€** per kit.  
 
-* **09.08.2024** New boars with a RX-TX resistor for noise reduction. Testing...
+* **09.08.2024** New boars with a RX - TX resistor for noise reduction. Testing...
 * **09.07.2024** Firmware **1.0-09072024** with better random seed.  
 * **25.06.2024** Gerber files added.  
 * **25.06.2024** The PCBs arrived, a testing Cheapolino was build and runs perfectly!  
