@@ -2,7 +2,7 @@
   
 The easy-to-build budget version of Nokolino with advanced power saving. Cheapolino aims to cost less then **10€** per kit.  
 
-* **07.01.2026** Stalled work on Cheapolino für Schimpfolino und Arduino-extensions work. Hopefully, Cheapolino will be ready in March.  
+* **07.01.2026** Stalled work on Cheapolino for Schimpfolino und Arduino extensions work. Hopefully, Cheapolino will be ready in March.  
 * **09.08.2024** New boards with a RX - TX resistor for noise reduction.
 * **09.07.2024** Firmware **1.0-09072024** with better random seed.  
 * **25.06.2024** Gerber files added.  
